@@ -1,27 +1,74 @@
 # ChatbotAngular
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.0.3.
+In this lesson, we are going to build a chatbot in Angular from scratch using the Dialogflow conversation platform (formerly known as API.ai). Natural language processing (NLP) is one of the most challenging problems in machine learning. Over the past couple years, advances in large scale deep neural networks have made NLP technology available to the average developer.
+In addition to Angular, you can deploy your bot to a wide variety of platforms with a single click - including Slack, Facebook Messenger, and many others.
+This project is open source and can be found on github - Angular Chatbot.
 
-## Development server
+angular chatbot demo with DialogFlow
+Initial Setup Guide
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Follow the steps below to get up and running quickly.
+New Angular App from Scratch
 
-## Code scaffolding
+For this tutorial, I will be starting a brand new Angular app from scratch. Make sure you are using v4.2 or later to take advantage of new Angular Animation features.
+npm install -g @angular/cli
+$ng new chatbot
+$cd chatbot
+Install Required Libraries
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+Our app has a only one extra dependency - the DialogFlow JavaScript SDK. It is written in TypeScript, so we can install it to the dev dependencies.
+Currently, the SDK is still named api-ai, but I imagine this will change to dialogflow in the future. You can find the latest official SDKs here.
 
-## Build
+$npm install api-ai-javascript --save-dev
+Fleshing out a Feature NgModule
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+We’re going to put all of our code into a feature module. This is a good practice in Angular to keep your code isolated and maintainable.
+$ng g module chat
+$ng g service chat -m chat
+$ng g component chat/chat-dialog -m chat
+The module should look like this. We only need to add the Angular FormsModule to the imports and add the ChatDialogComponent to exports.
+/// chat.module.ts
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ChatService } from '../chat.service';
+import { ChatDialogComponent } from './chat-dialog/chat-dialog.component';
 
-## Running unit tests
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+@NgModule({
+  imports: [
+    CommonModule,
+    FormsModule
+  ],
+  declarations: [
+    ChatDialogComponent
+  ],
+  exports: [ ChatDialogComponent ], // <-- export here
+  providers: [ChatService]
+})
+export class ChatModule { }
+Then import the chat module into the app module
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
 
-## Running end-to-end tests
+import { AppComponent } from './app.component';
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+import { ChatModule } from './chat/chat.module';
 
-## Further help
+@NgModule({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    ChatModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+Now we have an isolated feature module that can be used in the main app.
+You can also do this by loading the component with the Angular Router, but our app is not using routing for this example.
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+<!-- app.component -->
+<chat-dialog></chat-dialog>
